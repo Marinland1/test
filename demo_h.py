@@ -236,18 +236,26 @@ def see_list():
         # 获取本年第一天
         year_start = datetime(datetime.now().year, 1, 1)
         start_date = year_start
+        end_date = datetime(datetime.now().year, 12, 31)
     elif button2:
         # 获取本月第一天
         this_month = datetime.now().month
         year = datetime.now().year
         month_start = datetime(year, this_month, 1)
         start_date = month_start
+        if this_month == 1 or 3 or 5 or 7 or 8 or 10 or 12:
+            end_date = datetime(year, this_month, 31)
+        if this_month == 4 or 6 or 9 or 11:
+            end_date = datetime(year, this_month, 30)
+        if this_month == 2:
+            end_date = datetime(year, this_month, 28)
     elif button3:
         # 获取本周第一天（这里以周一为一周开始）
         today = datetime.now()
         offset = today.weekday()
         week_start = today - timedelta(days=offset)
         start_date = week_start
+        end_date = datetime.now()
     start_date1 = col11.date_input('Start Date', value=start_date)
     end_date1 = col12.date_input('End Date', value=end_date)
     filtered_events = df[((df['Start date'] >= start_date1 ) & (df['End date'] <= end_date1)) |
@@ -357,6 +365,7 @@ def change_list():
                 time.sleep(0.5)
 
 def calendar():
+    dfc = pd.read_excel('demo_h.xlsx')
     mode = st.selectbox(
         "Calendar Mode:",
         (
@@ -370,11 +379,11 @@ def calendar():
             "multimonth",
         ),
     )
-    df['department'] = df['Departement'].str[:2]
+    dfc['department'] = dfc['Departement'].str[:2]
     events = []
 
     # dataframe转换为list
-    for index, row in df.iterrows():
+    for index, row in dfc.iterrows():
         if row['department'] == 'EA':
             event = {
                 'title': str(row['Detial']) + str(row['Order_ID']),
@@ -401,6 +410,8 @@ def calendar():
                 'end': row['End date'].strftime('%Y-%m-%d'),
                 'resourceId': row['Order_ID']
             }
+            events.append(event)
+
 
     calendar_options = {
         "editable": "false",
@@ -424,14 +435,14 @@ def calendar():
                     "center": "title",
                     "right": "resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth",
                 },
-                "initialDate": "2023-07-01",
+                "initialDate": "2024-07-01",
                 "initialView": "resourceTimelineDay",
                 "resourceGroupField": "building",
             }
         elif mode == "resource-timegrid":
             calendar_options = {
                 **calendar_options,
-                "initialDate": "2023-07-01",
+                "initialDate": "2024-07-01",
                 "initialView": "resourceTimeGridDay",
                 "resourceGroupField": "building",
             }
@@ -444,7 +455,7 @@ def calendar():
                     "center": "title",
                     "right": "dayGridDay,dayGridWeek,dayGridMonth",
                 },
-                "initialDate": "2023-07-01",
+                "initialDate": "2024-07-01",
                 "initialView": "dayGridMonth",
             }
         elif mode == "timegrid":
@@ -460,13 +471,13 @@ def calendar():
                     "center": "title",
                     "right": "timelineDay,timelineWeek,timelineMonth",
                 },
-                "initialDate": "2023-07-01",
+                "initialDate": "2024-07-01",
                 "initialView": "timelineMonth",
             }
         elif mode == "list":
             calendar_options = {
                 **calendar_options,
-                "initialDate": "2023-07-01",
+                "initialDate": "2024-07-01",
                 "initialView": "listMonth",
             }
         elif mode == "multimonth":
@@ -477,7 +488,7 @@ def calendar():
 
     # state = cda(events=events, options=calendar_options, key="calendar")
     state = cda(
-        events=st.session_state.get("events", events),
+        events=events,
         options=calendar_options,
         custom_css="""
         .fc-event-past {
@@ -496,8 +507,8 @@ def calendar():
         key=mode,
     )
 
-    if state.get("eventsSet") is not None:
-        st.session_state["events"] = state["eventsSet"]
+    # if state.get("eventsSet") is not None:
+    #     st.session_state["events"] = state["eventsSet"]
 
 def anay_time():
     menu = ['人员','项目ID','部门','下单人']
@@ -525,35 +536,46 @@ def anay_time():
             # 获取本年第一天
             year_start = datetime(datetime.now().year, 1, 1)
             start_date = year_start
+            end_date = datetime(datetime.now().year, 12, 31)
         elif button2 :
             # 获取本月第一天
             this_month = datetime.now().month
             year = datetime.now().year
             month_start = datetime(year, this_month, 1)
             start_date = month_start
+            if this_month == 1 or 3 or 5 or 7 or 8 or 10 or 12:
+                end_date = datetime(year, this_month, 31)
+            if this_month == 4 or 6 or 9 or 11:
+                end_date = datetime(year, this_month, 30)
+            if this_month == 2:
+                end_date = datetime(year, this_month, 28)
         elif button3 :
             # 获取本周第一天（这里以周一为一周开始）
             today = datetime.now()
             offset = today.weekday()
             week_start = today - timedelta(days=offset)
             start_date = week_start
+            end_date = datetime.now()
         start_date1 = col11.date_input('Start Date',value = start_date)
         end_date1 = col12.date_input('End Date', value = end_date)
-        data = []
+        if start_date1 > end_date1:
+            st.write('Error! end_data need to be the future of the start data')
+        else:
+            data = []
         #这里用exe_name1是为了跳过第一行的nan
-        for i in exe_name1:
-            last_time , time = Accumulated_working_hours(start_date1, end_date1, i)
-            data.append([i, time])
-        df_exe = pd.DataFrame(data, columns=['姓名', '累计工时'])
-        col21.dataframe(df_exe)
-        #画柱状图
-        col22.bar_chart(df_exe,x='姓名',y='累计工时')
-        #画饼状图
-        fig, ax = plt.subplots()
-        ax.pie(df_exe['累计工时'], labels=df_exe['姓名'], autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')  # 确保饼状图是圆形的
-        # 在 Streamlit 中展示图表
-        col23.pyplot(fig)
+            for i in exe_name1:
+                last_time , time = Accumulated_working_hours(start_date1, end_date1, i)
+                data.append([i, time])
+            df_exe = pd.DataFrame(data, columns=['姓名', '累计工时'])
+            col21.dataframe(df_exe)
+            #画柱状图
+            col22.bar_chart(df_exe,x='姓名',y='累计工时')
+            #画饼状图
+            fig, ax = plt.subplots()
+            ax.pie(df_exe['累计工时'], labels=df_exe['姓名'], autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # 确保饼状图是圆形的
+            # 在 Streamlit 中展示图表
+            col23.pyplot(fig)
     if menu_choice1 == '项目ID':
         row1 = st.columns([1,1,1,7])
         row2 = st.columns(2)
@@ -571,38 +593,49 @@ def anay_time():
         button3 = col03.button("本周")
         start_date = datetime.now()
         end_date = datetime.now()
-        if button1 :
+        if button1:
             # 获取本年第一天
             year_start = datetime(datetime.now().year, 1, 1)
             start_date = year_start
-        elif button2 :
+            end_date = datetime(datetime.now().year, 12, 31)
+        elif button2:
             # 获取本月第一天
             this_month = datetime.now().month
             year = datetime.now().year
             month_start = datetime(year, this_month, 1)
             start_date = month_start
-        elif button3 :
+            if this_month == 1 or 3 or 5 or 7 or 8 or 10 or 12:
+                end_date = datetime(year, this_month, 31)
+            if this_month == 4 or 6 or 9 or 11:
+                end_date = datetime(year, this_month, 30)
+            if this_month == 2:
+                end_date = datetime(year, this_month, 28)
+        elif button3:
             # 获取本周第一天（这里以周一为一周开始）
             today = datetime.now()
             offset = today.weekday()
             week_start = today - timedelta(days=offset)
             start_date = week_start
-        start_date2 = col11.date_input('Start Date',value = start_date)
-        end_date2 = col12.date_input('End Date', value = end_date)
-        dfp = pd.read_excel('demo_h.xlsx')
-        dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
-        grouped = dfpp.groupby('Project_id')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
-        # 查看分组后的结果
-        # print(grouped)
-        col21.dataframe(grouped)
-        #画柱状图
-        col22.bar_chart(grouped,x='Project_id',y='Hours_spent')
-        #画饼状图
-        fig, ax = plt.subplots()
-        ax.pie(grouped['Hours_spent'], labels=grouped['Project_id'], autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')  # 确保饼状图是圆形的
-        # 在 Streamlit 中展示图表
-        col23.pyplot(fig)
+            end_date = datetime.now()
+        start_date2 = col11.date_input('Start Date', value=start_date)
+        end_date2 = col12.date_input('End Date', value=end_date)
+        if start_date2 > end_date2:
+            st.write('Error! end_data need to be the future of the start data')
+        else:
+            dfp = pd.read_excel('demo_h.xlsx')
+            dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
+            grouped = dfpp.groupby('Project_id')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
+            # 查看分组后的结果
+            # print(grouped)
+            col21.dataframe(grouped)
+            #画柱状图
+            col22.bar_chart(grouped,x='Project_id',y='Hours_spent')
+            #画饼状图
+            fig, ax = plt.subplots()
+            ax.pie(grouped['Hours_spent'], labels=grouped['Project_id'], autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # 确保饼状图是圆形的
+            # 在 Streamlit 中展示图表
+            col23.pyplot(fig)
 
 
     if menu_choice1 == '部门':
@@ -622,40 +655,51 @@ def anay_time():
         button3 = col03.button("本周")
         start_date = datetime.now()
         end_date = datetime.now()
-        if button1 :
+        if button1:
             # 获取本年第一天
             year_start = datetime(datetime.now().year, 1, 1)
             start_date = year_start
-        elif button2 :
+            end_date = datetime(datetime.now().year, 12, 31)
+        elif button2:
             # 获取本月第一天
             this_month = datetime.now().month
             year = datetime.now().year
             month_start = datetime(year, this_month, 1)
             start_date = month_start
-        elif button3 :
+            if this_month == 1 or 3 or 5 or 7 or 8 or 10 or 12:
+                end_date = datetime(year, this_month, 31)
+            if this_month == 4 or 6 or 9 or 11:
+                end_date = datetime(year, this_month, 30)
+            if this_month == 2:
+                end_date = datetime(year, this_month, 28)
+        elif button3:
             # 获取本周第一天（这里以周一为一周开始）
             today = datetime.now()
             offset = today.weekday()
             week_start = today - timedelta(days=offset)
             start_date = week_start
-        start_date2 = col11.date_input('Start Date',value = start_date)
-        end_date2 = col12.date_input('End Date', value = end_date)
-        dfp = pd.read_excel('demo_h.xlsx')
+            end_date = datetime.now()
+        start_date2 = col11.date_input('Start Date', value=start_date)
+        end_date2 = col12.date_input('End Date', value=end_date)
+        if start_date2 > end_date2:
+            st.write('Error! end_data need to be the future of the start data')
+        else :
+            dfp = pd.read_excel('demo_h.xlsx')
         # 根据单元格内容前两位进行分组
-        dfpf = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
-        dfpf['department'] = dfpf['Departement'].str[:2]                                  #只保留departement的前两位
-        grouped = dfpf.groupby('department')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
+            dfpf = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
+            dfpf['department'] = dfpf['Departement'].str[:2]                                  #只保留departement的前两位
+            grouped = dfpf.groupby('department')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
         # 查看分组后的结果
         # print(grouped)
-        col21.dataframe(grouped)
+            col21.dataframe(grouped)
         #画柱状图
-        col22.bar_chart(grouped,x='department',y='Hours_spent')
+            col22.bar_chart(grouped,x='department',y='Hours_spent')
         #画饼状图
-        fig, ax = plt.subplots()
-        ax.pie(grouped['Hours_spent'], labels=grouped['department'], autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')  # 确保饼状图是圆形的
+            fig, ax = plt.subplots()
+            ax.pie(grouped['Hours_spent'], labels=grouped['department'], autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # 确保饼状图是圆形的
         # 在 Streamlit 中展示图表
-        col23.pyplot(fig)
+            col23.pyplot(fig)
     if menu_choice1 == '下单人':
         row1 = st.columns([1,1,1,7])
         row2 = st.columns(2)
@@ -673,39 +717,50 @@ def anay_time():
         button3 = col03.button("本周")
         start_date = datetime.now()
         end_date = datetime.now()
-        if button1 :
+        if button1:
             # 获取本年第一天
             year_start = datetime(datetime.now().year, 1, 1)
             start_date = year_start
-        elif button2 :
+            end_date = datetime(datetime.now().year, 12, 31)
+        elif button2:
             # 获取本月第一天
             this_month = datetime.now().month
             year = datetime.now().year
             month_start = datetime(year, this_month, 1)
             start_date = month_start
-        elif button3 :
+            if this_month == 1 or 3 or 5 or 7 or 8 or 10 or 12:
+                end_date = datetime(year, this_month, 31)
+            if this_month == 4 or 6 or 9 or 11:
+                end_date = datetime(year, this_month, 30)
+            if this_month == 2:
+                end_date = datetime(year, this_month, 28)
+        elif button3:
             # 获取本周第一天（这里以周一为一周开始）
             today = datetime.now()
             offset = today.weekday()
             week_start = today - timedelta(days=offset)
             start_date = week_start
-        start_date2 = col11.date_input('Start Date',value = start_date)
-        end_date2 = col12.date_input('End Date', value = end_date)
-        dfp = pd.read_excel('demo_h.xlsx')
+            end_date = datetime.now()
+        start_date2 = col11.date_input('Start Date', value=start_date)
+        end_date2 = col12.date_input('End Date', value=end_date)
+        if start_date2 > end_date2:
+            st.write('Error! end_data need to be the future of the start data')
+        else:
+            dfp = pd.read_excel('demo_h.xlsx')
         # 根据单元格内容前两位进行分组
-        dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
-        grouped = dfpp.groupby('Applicant')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
+            dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
+            grouped = dfpp.groupby('Applicant')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
         # 查看分组后的结果
         # print(grouped)
-        col21.dataframe(grouped)
+            col21.dataframe(grouped)
         #画柱状图
-        col22.bar_chart(grouped,x='Applicant',y='Hours_spent')
+            col22.bar_chart(grouped,x='Applicant',y='Hours_spent')
         #画饼状图
-        fig, ax = plt.subplots()
-        ax.pie(grouped['Hours_spent'], labels=grouped['Applicant'], autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')  # 确保饼状图是圆形的
+            fig, ax = plt.subplots()
+            ax.pie(grouped['Hours_spent'], labels=grouped['Applicant'], autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # 确保饼状图是圆形的
         # 在 Streamlit 中展示图表
-        col23.pyplot(fig)
+            col23.pyplot(fig)
 
 
 def main():
