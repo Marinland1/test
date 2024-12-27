@@ -423,7 +423,7 @@ def calendar():
         if mode == "resource-daygrid":
             calendar_options = {
                 **calendar_options,
-                "initialDate": "2024-07-01",
+                "initialDate": str(datetime.now().date()),
                 "initialView": "resourceDayGridDay",
                 "resourceGroupField": "building",
             }
@@ -455,7 +455,7 @@ def calendar():
                     "center": "title",
                     "right": "dayGridDay,dayGridWeek,dayGridMonth",
                 },
-                "initialDate": "2024-07-01",
+                "initialDate": str(datetime.now().date()),
                 "initialView": "dayGridMonth",
             }
         elif mode == "timegrid":
@@ -471,13 +471,13 @@ def calendar():
                     "center": "title",
                     "right": "timelineDay,timelineWeek,timelineMonth",
                 },
-                "initialDate": "2024-07-01",
+                "initialDate": str(datetime.now().date()),
                 "initialView": "timelineMonth",
             }
         elif mode == "list":
             calendar_options = {
                 **calendar_options,
-                "initialDate": "2024-07-01",
+                "initialDate": str(datetime.now().date()),
                 "initialView": "listMonth",
             }
         elif mode == "multimonth":
