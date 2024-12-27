@@ -568,6 +568,8 @@ def anay_time():
                 data.append([i, time])
             df_exe = pd.DataFrame(data, columns=['姓名', '累计工时'])
             col21.dataframe(df_exe)
+            st.text('总计工时：')
+            st.text(df_exe['累计工时'].sum())
             #画柱状图
             col22.bar_chart(df_exe,x='姓名',y='累计工时')
             #画饼状图
@@ -625,6 +627,8 @@ def anay_time():
             dfp = pd.read_excel('demo_h.xlsx')
             dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
             grouped = dfpp.groupby('Project_id')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
+            st.text('总计工时：')
+            st.text(dfpp['Hours_spent'].sum())
             # 查看分组后的结果
             # print(grouped)
             col21.dataframe(grouped)
@@ -689,6 +693,8 @@ def anay_time():
             dfpf = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
             dfpf['department'] = dfpf['Departement'].str[:2]                                  #只保留departement的前两位
             grouped = dfpf.groupby('department')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
+            st.text('总计工时：')
+            st.text(dfpf['Hours_spent'].sum())
         # 查看分组后的结果
         # print(grouped)
             col21.dataframe(grouped)
@@ -750,6 +756,8 @@ def anay_time():
         # 根据单元格内容前两位进行分组
             dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
             grouped = dfpp.groupby('Applicant')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
+            st.text('总计工时：')
+            st.text(dfpp['Hours_spent'].sum())
         # 查看分组后的结果
         # print(grouped)
             col21.dataframe(grouped)
