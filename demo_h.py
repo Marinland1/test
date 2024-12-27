@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from streamlit_calendar import calendar as cda
 #matplotlib中设置中文字体，否则中文不会显示。字体从C:\Windows\Fonts中找。
-matplotlib.rcParams['font.sans-serif'] = [u'simsun']
+matplotlib.rcParams['font.sans-serif'] = ['simsun']
 matplotlib.rcParams['axes.unicode_minus'] = False
 # font_set = FontProperties(fname=r'C:\Windows\Fonts\simsun.ttc')
 # import plotly.express as px
