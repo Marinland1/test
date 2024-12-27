@@ -16,7 +16,7 @@ matplotlib.rcParams['axes.unicode_minus'] = False
 # import plotly.express as px
 
 st.set_page_config(
-    page_title='test',
+    page_title='Working Task Management ',
     page_icon='🦈',
     layout='wide',
     initial_sidebar_state='auto',
