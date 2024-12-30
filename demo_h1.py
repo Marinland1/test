@@ -66,6 +66,13 @@ def upload_to_github(file_path, repo, path_in_repo, commit_message, access_token
     }
 
     response = requests.put(url, headers=headers, json=data)
+
+    if response.status_code in [200, 201]:
+        st.success("文件成功上传到 GitHub")
+    else:
+        st.error(f"文件上传失败: {response.status_code}")
+        st.error(response.json())
+
     return response.json()
 
 
@@ -77,6 +84,7 @@ def write_excel(data):
     df_new = pd.concat([df,data],axis=0)
     with pd.ExcelWriter('demo_h.xlsx', mode='w') as writer:
         df_new.to_excel(writer, sheet_name='Hours', index=False)
+
     file_path = 'demo_h.xlsx'  # 本地文件路径
     repo = 'Marinland1/test'  # 仓库名
     path_in_repo = 'demo_h.xlsx'  # 仓库中的路径
