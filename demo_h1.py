@@ -89,7 +89,7 @@ def write_excel(data):
     repo = 'Marinland1/test'  # 仓库名
     path_in_repo = 'demo_h.xlsx'  # 仓库中的路径
     commit_message = 'Update demo_h.xlsx'
-    access_token = 'Hjl520hjl###'  # 你的 GitHub 个人访问令牌
+    access_token = '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'  # 你的 GitHub 个人访问令牌
     response = upload_to_github(file_path, repo, path_in_repo, commit_message, access_token)
     print(response)
 
@@ -255,7 +255,7 @@ def add_task():
         })
             write_excel(work_order)
             st.success('工单添加成功！')
-            time.sleep(50)
+            time.sleep(500)
             st.rerun()
 
 
