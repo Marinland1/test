@@ -255,7 +255,7 @@ def add_task():
         })
             write_excel(work_order)
             st.success('工单添加成功！')
-            time.sleep(0.5)
+            time.sleep(50)
             st.rerun()
 
 
