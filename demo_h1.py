@@ -26,7 +26,7 @@ st.set_page_config(
 )
 
 #初始化写入的路径
-excel_file = 'demo_h.xlsx'
+excel_file = 'C:\demo\demo_h.xlsx'
 # 初始化数据框架
 if not os.path.exists(excel_file):
     df = pd.DataFrame(columns=['Order_ID', 'Applicant', 'Departement', 'Project_id', 'Start date', 'End date','Executor1','Executor2','Hours_spent','Detial'])#这里的名称一定要和写入名称匹配，否则会创建多余的列
@@ -82,14 +82,15 @@ def write_excel(data):
     #     row['Start Date'] = pd.to_datetime(row['Start Date']).strftime('%Y-%m-%d')
     #     row['End Date'] = pd.to_datetime(row['End Date']).strftime('%Y-%m-%d')
     df_new = pd.concat([df,data],axis=0)
-    with pd.ExcelWriter('demo_h.xlsx', mode='w') as writer:
+    with pd.ExcelWriter('C:\demo\demo_h.xlsx', mode='w') as writer:
         df_new.to_excel(writer, sheet_name='Hours', index=False)
 
-    file_path = 'demo_h.xlsx'  # 本地文件路径
+    file_path = 'C:\demo\demo_h.xlsx'  # 本地文件路径
     repo = 'Marinland1/test'  # 仓库名
-    path_in_repo = 'demo_h.xlsx'  # 仓库中的路径
-    commit_message = 'Update demo_h.xlsx'
-    access_token = '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'  # 你的 GitHub 个人访问令牌
+    path_in_repo = 'C:\demo\demo_h.xlsx'  # 仓库中的路径
+    commit_message = 'Update C:\demo\demo_h.xlsx'
+    # access_token = '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'  # 你的 GitHub 个人访问令牌
+    access_token = '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'
     response = upload_to_github(file_path, repo, path_in_repo, commit_message, access_token)
     print(response)
 
@@ -401,13 +402,13 @@ def change_list():
                 ]
 
                 df.iloc[ind] = new_order
-                with pd.ExcelWriter('demo_h.xlsx', mode='w') as writer:
+                with pd.ExcelWriter('C:\demo\demo_h.xlsx', mode='w') as writer:
                     df.to_excel(writer, sheet_name='Hours', index=False)
                 st.success('工单添加成功！')
                 time.sleep(0.5)
 
 def calendar():
-    dfc = pd.read_excel('demo_h.xlsx')
+    dfc = pd.read_excel('C:\demo\demo_h.xlsx')
     mode = st.selectbox(
         "Calendar Mode:",
         (
@@ -666,7 +667,7 @@ def anay_time():
         if start_date2 > end_date2:
             st.write('Error! end_data need to be the future of the start data')
         else:
-            dfp = pd.read_excel('demo_h.xlsx')
+            dfp = pd.read_excel('C:\demo\demo_h.xlsx')
             dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
             grouped = dfpp.groupby('Project_id')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
             st.text('总计工时：')
@@ -730,7 +731,7 @@ def anay_time():
         if start_date2 > end_date2:
             st.write('Error! end_data need to be the future of the start data')
         else :
-            dfp = pd.read_excel('demo_h.xlsx')
+            dfp = pd.read_excel('C:\demo\demo_h.xlsx')
         # 根据单元格内容前两位进行分组
             dfpf = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
             dfpf['department'] = dfpf['Departement'].str[:2]                                  #只保留departement的前两位
@@ -794,7 +795,7 @@ def anay_time():
         if start_date2 > end_date2:
             st.write('Error! end_data need to be the future of the start data')
         else:
-            dfp = pd.read_excel('demo_h.xlsx')
+            dfp = pd.read_excel('C:\demo\demo_h.xlsx')
         # 根据单元格内容前两位进行分组
             dfpp = dfp[(df['Start date'] >= start_date2) & (df['End date'] <= end_date2)]   #根据时间进行筛选
             grouped = dfpp.groupby('Applicant')['Hours_spent'].sum().reset_index()          #grouped 是分组以后的df
